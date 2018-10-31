@@ -1,1 +1,2 @@
-web: ./target/release/main
+ROCKET_PORT=$PORT
+ROCKET_ENV=prod ./target/release/main
