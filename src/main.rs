@@ -2,16 +2,17 @@
 #![plugin(rocket_codegen)]
 
 #[macro_use] extern crate serde_derive;
-
 extern crate serde;
 extern crate serde_json;
 extern crate rocket;
 
 use rocket::response::status;
-use rocket::http::Status;
+use std::fs::File;
+use std::io::Read;
 
+#[derive(Debug, Deserialize, Serialize)]
 struct BeerEntry {
-    id: u32,
+    date: String,
     brewery: String,
     name: String,
     description: String,
@@ -27,8 +28,12 @@ fn index() -> status::Accepted<String> {
 }
 
 #[get("/beers")]
-fn get_beers() -> status::Accepted<String> {
-    status::Accepted(Some(format!("Ok")))
+fn get_beers() -> String {
+    let mut data = String::new();
+    let mut f = File::open("beer.json").expect("Unable to open file");
+    f.read_to_string(&mut data).expect("Unable to read string");
+    // let deserialized: Vec<BeerEntry> = serde_json::from_str(&data).unwrap();
+    data
 }
 
 
