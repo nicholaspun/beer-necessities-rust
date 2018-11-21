@@ -6,7 +6,7 @@ extern crate serde;
 extern crate serde_json;
 extern crate rocket;
 
-use rocket::response::status;
+use rocket::response;
 use std::fs::File;
 use std::io::Read;
 
@@ -23,8 +23,8 @@ struct BeerEntry {
 }
 
 #[get("/")]
-fn index() -> status::Accepted<String> {
-    status::Accepted(Some(format!("Ok")))
+fn index() -> response::status::Accepted<String> {
+    response::status::Accepted(Some(format!("Ok")))
 }
 
 #[get("/beers")]
@@ -36,7 +36,15 @@ fn get_beers() -> String {
     data
 }
 
+#[options("/beers")]
+fn options_beer<'a>() -> response::Response<'a> {
+    response::Response::build()
+        .raw_header("Access-Control-Allow-Origin", "*")
+        .raw_header("Access-Control-Allow-Methods", "GET")
+        .finalize()
+}
+
 
 fn main() {
-    rocket::ignite().mount("/", routes![index, get_beers]).launch();
+    rocket::ignite().mount("/", routes![index, get_beers, options_beer]).launch();
 }
