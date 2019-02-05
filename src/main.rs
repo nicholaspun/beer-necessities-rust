@@ -1,12 +1,12 @@
-#![feature(plugin)]
-#![plugin(rocket_codegen)]
+#![feature(proc_macro_hygiene, decl_macro)]
 
 #[macro_use] extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
 extern crate rocket;
 
-use rocket::response;
+use rocket::{response, get, routes};
+use rocket_cors;
 use std::fs::File;
 use std::io::Read;
 
@@ -36,15 +36,10 @@ fn get_beers() -> String {
     data
 }
 
-#[options("/beers")]
-fn options_beer<'a>() -> response::Response<'a> {
-    response::Response::build()
-        .raw_header("Access-Control-Allow-Origin", "*")
-        .raw_header("Access-Control-Allow-Methods", "GET")
-        .finalize()
-}
-
 
 fn main() {
-    rocket::ignite().mount("/", routes![index, get_beers, options_beer]).launch();
+    rocket::ignite()
+        .mount("/", routes![index, get_beers])
+        .attach(rocket_cors::Cors::default())
+        .launch();
 }
